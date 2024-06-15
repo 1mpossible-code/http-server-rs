@@ -1,5 +1,5 @@
 use std::net::{TcpListener, TcpStream};
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, Write};
 
 fn main() {
     let listener = TcpListener::bind("127.0.0.1:3000").unwrap();
@@ -11,12 +11,15 @@ fn main() {
     }
 }
 
-fn handle_connection(stream: TcpStream) {
-    let reader = BufReader::new(stream);
-    let mut lines = reader.lines();
+fn handle_connection(mut stream: TcpStream) {
+    let reader = BufReader::new(&stream);
+    let mut lines = reader.lines().map(|l| l.unwrap()).take_while(|l| l != "");
 
     while let Some(line) = lines.next() {
-        let line = line.unwrap();
         println!("{}", line);
     }
+
+    let response = "HTTP/1.1 200 OK\r\n\r\n";
+
+    stream.write(response.as_bytes()).unwrap();
 }
