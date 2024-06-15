@@ -1,5 +1,7 @@
-use std::net::{TcpListener, TcpStream};
-use std::io::{BufRead, BufReader, Write};
+use std::net::TcpListener;
+
+
+use http_server_rs::handle_connection;
 
 fn main() {
     let listener = TcpListener::bind("127.0.0.1:3000").unwrap();
@@ -9,22 +11,4 @@ fn main() {
 
         handle_connection(stream)
     }
-}
-
-fn handle_connection(mut stream: TcpStream) {
-    let reader = BufReader::new(&stream);
-    let mut lines = reader.lines().map(|l| l.unwrap()).take_while(|l| l != "");
-
-    while let Some(line) = lines.next() {
-        println!("{}", line);
-    }
-
-    let response = "HTTP/1.1 200 OK\r\n\r\n";
-
-    // Send html file as response
-    let html = include_str!("test.html");
-    let response = format!("{}{}", response, html);
-
-
-    stream.write(response.as_bytes()).unwrap();
 }
