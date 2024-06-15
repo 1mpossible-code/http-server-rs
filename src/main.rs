@@ -21,5 +21,10 @@ fn handle_connection(mut stream: TcpStream) {
 
     let response = "HTTP/1.1 200 OK\r\n\r\n";
 
+    // Send html file as response
+    let html = include_str!("test.html");
+    let response = format!("{}{}", response, html);
+
+
     stream.write(response.as_bytes()).unwrap();
 }
