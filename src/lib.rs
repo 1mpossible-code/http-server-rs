@@ -32,12 +32,33 @@ impl Controller {
     pub fn handle_connection(&self, mut stream: TcpStream) {
         let reader = BufReader::new(&stream);
         let mut lines = reader.lines().next().unwrap().unwrap();
-        let path = format!("{}", lines.split_whitespace().nth(1).unwrap());
-
-        println!("path: {}", path);
+        let path = Controller::get_path(&lines);
 
         let response = "HTTP/1.1 200 OK\r\n\r\n";
 
+        let content_body = self.get_content_body(&path);
+
+        let response = format!("{}{}", response, content_body);
+
         stream.write(response.as_bytes()).unwrap();
+    }
+
+    fn get_path(header_line: &str) -> String {
+        let path = header_line.split_whitespace().nth(1).unwrap();
+        path.to_string()
+    }
+
+    fn get_content_body(&self, path: &str) -> String {
+        for route in &self.routes {
+            if route.path == path {
+                if route.body.ends_with(".html") {
+                    let body = std::fs::read_to_string(&route.body).unwrap();
+                    return body;
+                }
+                return route.body.clone();
+            }
+        }
+
+        String::from("404 Not Found")
     }
 }

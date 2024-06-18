@@ -7,6 +7,8 @@ fn main() {
 
     let mut controller = Controller::new();
 
+    controller.add_route("/test", "test.html");
+
     for stream in listener.incoming() {
         let stream = stream.unwrap();
 
