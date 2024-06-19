@@ -1,5 +1,4 @@
 use std::{
-    fmt::format,
     io::{BufRead, BufReader, Write},
     net::TcpStream,
 };
@@ -31,7 +30,7 @@ impl Controller {
 
     pub fn handle_connection(&self, mut stream: TcpStream) {
         let reader = BufReader::new(&stream);
-        let mut lines = reader.lines().next().unwrap().unwrap();
+        let lines = reader.lines().next().unwrap().unwrap();
         let path = Controller::get_path(&lines);
 
         let response = "HTTP/1.1 200 OK\r\n\r\n";
